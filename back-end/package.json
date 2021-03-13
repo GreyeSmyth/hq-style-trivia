@@ -1,0 +1,14 @@
+{
+  "name": "trivia-back-end",
+  "version": "1.0.0",
+  "description": "Backend for HQ Trivia style quiz game",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Greye Smyth",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
