@@ -9,6 +9,7 @@
   "author": "Greye Smyth",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "uuid": "^8.3.2",
+    "ws": "^7.4.4"
   }
 }
