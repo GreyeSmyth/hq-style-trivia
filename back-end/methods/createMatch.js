@@ -2,7 +2,7 @@ const matchCodeInUseError = require('../errors/matchCodeInUseError');
 const createNewMatch = require('../models/match');
 
 
-function createMatch({ matchCode, userName }, context) {
+function createMatch({ matchCode }, context) {
     if (context.getMatch(matchCode)) {
         return matchCodeInUseError;
     }
@@ -11,10 +11,12 @@ function createMatch({ matchCode, userName }, context) {
         createNewMatch(() => context.removeMatch(matchCode)),
         matchCode,
     );
-    const playerID = match.addPlayer(userName, context.notifyClient, context.disconnect);
+    const playerID = match.addPlayer(context.notifyClient);
     return {
-        code: 'match-created',
+        method: 'matchJoined',
+        matchCode,
         playerID,
+        ...match.currentState,
     };
 }
 

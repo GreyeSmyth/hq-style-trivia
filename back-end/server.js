@@ -1,4 +1,4 @@
-const ws = require('ws');
+const WebSocket = require('ws');
 
 const config = require('./config');
 const methods = require('./methods');
@@ -6,7 +6,7 @@ const methods = require('./methods');
 const malformedRequestError = require('./errors/malformedRequestError');
 
 
-const wss = ws.Server({
+const wss = new WebSocket.Server({
 	port: config.port,
 	clientTracking: true,
 });
@@ -37,7 +37,6 @@ wss.on('connection', ws => {
 						// TODO: log error
 					}
 				},
-				disconnect: () => ws.close(0, 'Socket closed from normal operations.'),
 				...matchesContext,
 			});
 		} catch(e) {

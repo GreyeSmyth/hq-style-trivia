@@ -1,10 +1,7 @@
-function createNewPlayer(userName, notifyClient, disconnect) {
+function createNewPlayer(notifyClient) {
 	let currentAnswerID;
 
 	return {
-		get playerName() {
-			return userName;
-		},
 		get selectedAnswer() {
 			return currentAnswerID;
 		},
@@ -14,9 +11,6 @@ function createNewPlayer(userName, notifyClient, disconnect) {
 		notify(message) {
 			notifyClient(message);
 		},
-		disconnect() {
-			disconnect();
-		}
 	};
 }
 

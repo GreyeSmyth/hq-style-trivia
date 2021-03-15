@@ -1,4 +1,4 @@
-const MATCH_STATE = require('../enums/matchState');
+const MATCH_STATE = require('../definitions/enums/matchState');
 const matchNotFoundError = require('../errors/matchNotFoundError');
 const playerNotFoundError = require('../errors/playerNotFoundError');
 const notAcceptingAnswersError = require('../errors/notAcceptingAnswersError');
@@ -20,9 +20,7 @@ function submitAnswer({ matchCode, playerID, answerID }, context) {
     }
 
     player.selectAnswer(answerID);
-    return {
-        code: 'answer-submitted',
-    };
+    return { code: 'answerSubmitted' };
 }
 
 module.exports = submitAnswer;

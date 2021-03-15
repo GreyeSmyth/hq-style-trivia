@@ -1,17 +1,17 @@
-const uuid = require('uuid/v4');
+const { v4: uuid } = require('uuid');
+
 
 const config = require('../config');
 
+const MATCH_STATE = require('../definitions/enums/matchState');
 const fetchQuestion = require('../data/fetchQuestion');
-const MATCH_STATE = require('../enums/matchState');
 
 const createNewPlayer = require('./player');
 const createNewRound = require('./round');
 
 
 function createNewMatch(disposer) {
-    const playerIDs = {};
-    const playerObjects = {};
+    const players = {};
 
     let matchState = MATCH_STATE.ACCEPTING_PLAYERS;
     let matchStartsAt;
@@ -19,18 +19,21 @@ function createNewMatch(disposer) {
     let currentRound = 0;
     let round;
 
-    get players() {
+    function listPlayers() {
         return Object.values(playerObjects);
+    }
+    function playersRequired() {
+        return listPlayers().length - config.minPlayers;
     }
 
     function broadcast(message) {
-        players.forEach(({ notify }) => notify(message));
+        listPlayers().forEach(({ notify }) => notify(message));
     };
 
     function scheduleMatchStart() {
         matchStartsAt = Date.now() + config.matchStartDelay;
         broadcast({
-            code: 'match-starting',
+            method: 'startMatch',
             matchStartsAt,
         });
 
@@ -42,9 +45,8 @@ function createNewMatch(disposer) {
 
         matchState = MATCH_STATE.NOT_ACCEPTING_ANSWERS;
         broadcast({
-            code: 'round-starting',
+            method: 'startRound',
             currentRound,
-            roundStartsAt: Date.now() + config.roundStartDelay,
         });
 
         setTimeout(startRound, config.roundStartDelay);
@@ -55,7 +57,7 @@ function createNewMatch(disposer) {
 
         matchState = MATCH_STATE.ACCEPTING_ANSWERS;
         broadcast({
-            code: 'new-question',
+            method: 'setQuestion',
             question: round.question,
             answers: round.answers,
             roundEndsAt: Date.now() + config.timeToAnswer,
@@ -66,36 +68,28 @@ function createNewMatch(disposer) {
 
     function displayRoundResults() {
         matchState = MATCH_STATE.NOT_ACCEPTING_ANSWERS;
-        players.forEach(({ selectedAnswer }) => round.tallyPlayerAnswer(selectedAnswer));
-        players
+        listPlayers().forEach(({ selectedAnswer }) => round.tallyPlayerAnswer(selectedAnswer));
+
+        const { answersTally, correctAnswer } = round;
+        listPlayers()
             .filter(({ selectedAnswer }) => selectedAnswer !== round.correctAnswer)
             .forEach(player => {
                 player.notify({
-                    code: 'incorrect-answer',
-                    round.answersTally,
-                    round.correctAnswer,
+                    method: 'revealAnswerWrong',
+                    correctAnswer,
+                    answersTally,
                 });
-                player.disconnect();
-
-                delete playerIDs[player.userName];
                 delete player;
             });
 
-        const matchWillContinue = players.length > 1;
-        players.forEach(player => {
-            player.selectAnswer();
-            player.notify({
-                code: matchWillContinue ? 'correct-answer' : 'match-won',
-                round.answersTally,
-                newRoundStartsAt: Date.now() + config.roundResultsLength,
-            });
-
-            if (!matchWillContinue) {
-                player.disconnect();
-            }
+        const matchWillContinue = listPlayers().length > 1;
+        broadcast({
+            method: matchWillContinue ? 'revealAnswerCorrect' : 'revealMatchWon',
+            answersTally,
         });
 
         if (matchWillContinue) {
+            listPlayers().forEach(player => player.selectAnswer());
             setTimeout(scheduleRoundStart, config.roundResultsLength);
         } else {
             disposer();
@@ -105,26 +99,21 @@ function createNewMatch(disposer) {
 	return {
 	    get currentState() {
             return {
-                userNames: Object.keys(playerIDs),
-                matchState,
+                playersRequired: playersRequired(),
                 matchStartsAt,
             };
         },
-        hasUserName(userName) {
-            return !!playerIDs[userName];
-        },
-        addPlayer(userName, notifyClient, disconnect) {
-            const player = createNewPlayer(userName, notifyClient, disconnect);
+        addPlayer(notifyClient) {
+            const player = createNewPlayer(notifyClient);
             const playerID = uuid();
 
-            playerIDs[userName] = playerID;
             playerObjects[playerID] = player;
 
             broadcast({
-                code: 'player-joined',
-                userName,
+                method: 'updatePlayers',
+                playersRequired: playersRequired(),
             });
-            if (players.length >= config.minPlayers) {
+            if (playersRequired() <= 0 && !matchStartsAt) {
                 scheduleMatchStart();
             }
 
