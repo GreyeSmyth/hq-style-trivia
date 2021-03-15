@@ -36,6 +36,10 @@ const WsListenerService = types
 			})
 		},
 
+		raiseError({ code, message }) {
+			console.error(`Server responded with an error: ${code}, ${message}`);
+		},
+
 		matchJoined({ matchCode, playerID, playersRequred, matchStartsAt }) {
 			self.modelStore.initMatch(matchCode, playerID, playersRequred, matchStartsAt);
 		},

@@ -42,7 +42,7 @@ const Match = types
 		},
 		selectAnswer(answer) {
 			self.currentRound.setSelectedAnswer(answer);
-			self.requestService.submitAnswer(self.id, self.player.id, self.answer.id);
+			self.requestService.submitAnswer(self.id, self.player.id, answer.id);
 		},
 		setWon() {
 			self.matchState = MATCH_STATE.WON;

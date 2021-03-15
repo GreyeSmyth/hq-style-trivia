@@ -122,6 +122,15 @@ function createNewMatch(disposer) {
         getPlayer(playerID) {
             return playerObjects[playerID];
         },
+        removePlayer(playerID) {
+            if (players[playerID]) {
+                delete players[playerID];
+                broadcast({
+                    method: 'updatePlayers',
+                    playersRequired: playersRequired(),
+                });
+            }
+        },
     };
 }
 

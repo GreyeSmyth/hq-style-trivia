@@ -1,5 +1,7 @@
 import { types, getEnv } from 'mobx-state-tree';
 
+import MATCH_STATE from '../definitions/enums/matchState';
+
 import Match from '../models/Match';
 
 
@@ -27,7 +29,12 @@ const ModelStore = types
 			}
 		},
 		leaveMatch() {
-			self.match = null;
+			if (self.match) {
+				if (self.match.matchState === MATCH_STATE.AWAITING_PLAYERS) {
+					self.requestService.leaveMatch(self.match.id, self.match.player.id);
+				}
+				self.match = null;
+			}
 		},
 		initMatch(matchCode, playerID, playersRequred, matchStartsAt) {
 			self.match = Match.create({

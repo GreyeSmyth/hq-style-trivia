@@ -35,6 +35,14 @@ const WsRequestService = types
 			});
 		},
 
+		leaveMatch(matchCode, playerID) {
+			self._sendToWebSocket({
+				method: 'leaveMatch',
+				matchCode,
+				playerID,
+			});
+		},
+
 		submitAnswer(matchCode, playerID, answerID) {
 			self._sendToWebSocket({
 				method: 'submitAnswer',
