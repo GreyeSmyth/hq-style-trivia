@@ -12,9 +12,37 @@ const WsRequestService = types
 		}
 	}))
 	.actions(self => ({
-		createMatch(matchCode) {},
-		joinMatch(matchCode) {},
-		submitAnswer(matchCode, playerID, answerID) {},
+		_sendToWebSocket(messageJSON) {
+			try {
+				const message = JSON.stringify(messageJSON);
+				self.webSocket.send(message);
+			} catch(e) {
+				console.error(e);
+			}
+		},
+
+		createMatch(matchCode) {
+			self._sendToWebSocket({
+				method: 'createMatch',
+				matchCode,
+			});
+		},
+
+		joinMatch(matchCode) {
+			self._sendToWebSocket({
+				method: 'joinMatch',
+				matchCode,
+			});
+		},
+
+		submitAnswer(matchCode, playerID, answerID) {
+			self._sendToWebSocket({
+				method: 'submitAnswer',
+				matchCode,
+				playerID,
+				answerID,
+			});
+		},
 	}));
 
 export default WsRequestService;

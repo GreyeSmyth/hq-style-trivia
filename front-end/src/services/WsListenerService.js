@@ -24,10 +24,12 @@ const WsListenerService = types
 		afterCreate() {
 			self.webSocket.addEventListener('message', (event) => {
 				try {
-					const { code, message, ...params } = JSON.parse(event);
-
-					// Direct event to appropriate handler
-
+					const { method, ...params } = JSON.parse(event);
+					if (self[method] instanceof Function) {
+						self[method](params);
+					} else {
+						console.error('Unrecognized method requested');
+					}
 				} catch (e) {
 					console.error('Unable to parse server message');
 				}
@@ -36,7 +38,7 @@ const WsListenerService = types
 
 		matchJoined({ matchCode, playerID, playersRequred, matchStartsAt }) {
 			self.modelStore.initMatch(matchCode, playerID, playersRequred, matchStartsAt);
-		}
+		},
 		
 		updatePlayers({ playersRequred }) {
 			if (self.match) {
@@ -58,6 +60,9 @@ const WsListenerService = types
 			if (self.round) {
 				self.round.setQuestion(question, answers, roundEndsAt);
 			}
+		},
+		answerSubmitted() {
+			// Nothing to do
 		},
 		revealAnswerWrong({ correctAnswer, answersTally }) {
 			if (self.round) {
