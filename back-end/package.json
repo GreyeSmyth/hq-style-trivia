@@ -9,6 +9,7 @@
   "author": "Greye Smyth",
   "license": "MIT",
   "dependencies": {
+    "he": "^1.2.0",
     "node-fetch": "^2.6.1",
     "uuid": "^8.3.2",
     "ws": "^7.4.4"

@@ -22,6 +22,11 @@ The `config.js` file in the `back-end` directory can be edited to tweak the serv
  * `roundStartDelay` - The interval between game rounds, in milliseconds.
  * `timeToAnswer` - The amount of time players are given to answer a question, in milliseconds.
  * `roundResultsLength` - The amount of time that a round's results are displayed for.
+ * `fallbackQuestion` - A default question used if the server is unable to reach the trivia API, as an object with the properties:
+	* `question` - A string containing the question.
+	* `correctAnswer` - A string containing the correct answer.
+	* `incorrectAnswers` - An array of strings, each containing an incorrect answer.
+ * `questionApiURL` - A URL to fetch trivia questions from. By default, the app uses the [Open Trivia DB](https://opentdb.com/)
 
 
 ## Frontend setup

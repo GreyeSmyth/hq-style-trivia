@@ -1,11 +1,11 @@
 const { v4: uuid } = require('uuid');
 
 
-function createNewRound({ question, correct_answer, incorrect_answers }) {
+function createNewRound({ question, correctAnswer, incorrectAnswers }) {
 	const correctAnswerID = uuid();
 
-	const answersArray = [ [ correctAnswerID, correct_answer ] ];
-	incorrect_answers
+	const answersArray = [ [ correctAnswerID, correctAnswer ] ];
+	incorrectAnswers
 		.map(incorrectAnswer => [ uuid(), incorrectAnswer])
 		.forEach(incorrectAnswer => answersArray.push(incorrectAnswer));
 	answersArray.sort(([ idA ], [ idB ]) => idA > idB ? 1 : -1);

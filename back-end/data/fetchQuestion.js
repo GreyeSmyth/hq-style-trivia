@@ -1,26 +1,31 @@
 const fetch = require('node-fetch');
+const he = require('he');
+
+const config = require('../config');
 
 
 async function fetchQuestion() {
-    let question = {
-        question: 'Why did Constantinople get the works?',
-        correct_answer: 'That\'s nobody\'s business but the Turks',
-        incorrect_answers: [
-            'Even old New York was once New Amsterdam',
-            'Why they changed it, I can\'t say',
-            'People just liked it better that way',
-        ],
-    };
+    let questionObject = config.fallbackQuestion;
 
-    const response = await fetch('https://opentdb.com/api.php?amount=1&type=multiple');
+    const response = await fetch(config.questionApiURL);
     try {
         responseBody = await response.json();
-        question = responseBody.results[0];
+        const {
+            question,
+            correct_answer,
+            incorrect_answers,
+        } = responseBody.results[0];
+
+        questionObject = {
+            question: he.decode(question),
+            correctAnswer: he.decode(correct_answer),
+            incorrectAnswers: incorrect_answers.map(ans => he.decode(ans)),
+        }
     } catch(e) {
 		console.error('Error fetching question', e);
     }
 
-	return question;
+	return questionObject;
 }
 
 module.exports = fetchQuestion;
