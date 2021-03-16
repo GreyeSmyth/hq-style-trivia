@@ -3,14 +3,18 @@ const { v4: uuid } = require('uuid');
 
 function createNewRound({ question, correct_answer, incorrect_answers }) {
 	const correctAnswerID = uuid();
-	const answers = {
-		[correctAnswerID]: correct_answer,
-		...incorrect_answers
-			.reduce((incorrectAnswers, answer) => {
-				incorrectAnswers[uuid()] = answer;
-				return incorrectAnswers;
-			}, {}),
-	}
+
+	const answersArray = [ [ correctAnswerID, correct_answer ] ];
+	incorrect_answers
+		.map(incorrectAnswer => [ uuid(), incorrectAnswer])
+		.forEach(incorrectAnswer => answersArray.push(incorrectAnswer));
+	answersArray.sort(([ idA ], [ idB ]) => idA > idB ? 1 : -1);
+
+	const answers = answersArray
+		.reduce((answersObject, [ id, answer ]) => {
+			answersObject[id] = answer;
+			return answersObject;
+		}, {});
 	const answersTally = {};
 
 	return {

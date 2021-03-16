@@ -1,7 +1,10 @@
-function createNewPlayer(notifyClient) {
+function createNewPlayer(playerID, notifyClient) {
 	let currentAnswerID;
 
 	return {
+		get playerID() {
+			return playerID;
+		},
 		get selectedAnswer() {
 			return currentAnswerID;
 		},

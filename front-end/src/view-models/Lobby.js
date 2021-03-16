@@ -18,19 +18,13 @@ const Lobby = types
 			return self.modelStore.match;
 		},
 		get remainingPlayersNeeded() {
-			return Math.max(self.match.remainingPlayers, 0);
+			return Math.max(self.match.playersRequired, 0);
 		},
 		get shouldDisplayRemainingPlayers() {
 			return self.match.matchState === MATCH_STATE.AWAITING_PLAYERS;
 		},
-		get shouldAllowReturnToMenu() {
-			return self.shouldDisplayRemainingPlayers;
-		},
-		get shouldDisplayStartingCountdown() {
-			return !!self.match.matchStartsAt;
-		},
 		get countdownValue() {
-			return self.shouldDisplayStartingCountdown
+			return self.match.matchStartsAt
 				&& toSecondsCountdown(self.match.matchStartsAt);
 		},
 	}))

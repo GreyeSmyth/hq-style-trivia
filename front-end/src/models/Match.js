@@ -15,10 +15,10 @@ const Match = types
 			MATCH_STATE.AWAITING_PLAYERS,
 		),
 
-		playersRequred: types.integer,
-		matchStartsAt: types.Date,
+		playersRequired: types.integer,
+		matchStartsAt: types.maybe(types.Date),
 
-		currentRound: types.maybe(Round),
+		round: types.maybe(Round),
 	})
 	.views(self => ({
 		get context() {
@@ -29,8 +29,8 @@ const Match = types
 		},
 	}))
 	.actions(self => ({
-		updatePlayers(playersRequred) {
-			self.playersRequred = playersRequred;
+		updatePlayers(playersRequired) {
+			self.playersRequired = playersRequired;
 		},
 		startMatch(startsAt) {
 			self.matchState = MATCH_STATE.STARTING;
@@ -38,10 +38,10 @@ const Match = types
 		},
 		startRound(number) {
 			self.matchState = MATCH_STATE.ACTIVE;
-			self.currentRound = Round.create({ number });
+			self.round = Round.create({ number });
 		},
 		selectAnswer(answer) {
-			self.currentRound.setSelectedAnswer(answer);
+			self.round.selectAnswer(answer);
 			self.requestService.submitAnswer(self.id, self.player.id, answer.id);
 		},
 		setWon() {

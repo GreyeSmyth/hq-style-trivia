@@ -20,10 +20,10 @@ function createNewMatch(disposer) {
     let round;
 
     function listPlayers() {
-        return Object.values(playerObjects);
+        return Object.values(players);
     }
     function playersRequired() {
-        return listPlayers().length - config.minPlayers;
+        return config.minPlayers - listPlayers().length;
     }
 
     function broadcast(message) {
@@ -79,7 +79,7 @@ function createNewMatch(disposer) {
                     correctAnswer,
                     answersTally,
                 });
-                delete player;
+                delete players[player.playerID];
             });
 
         const matchWillContinue = listPlayers().length > 1;
@@ -97,17 +97,18 @@ function createNewMatch(disposer) {
     };
 
 	return {
-	    get currentState() {
+        get matchState() {
+            return matchState;
+        },
+	    get lobbyState() {
             return {
                 playersRequired: playersRequired(),
                 matchStartsAt,
             };
         },
         addPlayer(notifyClient) {
-            const player = createNewPlayer(notifyClient);
-            const playerID = uuid();
-
-            playerObjects[playerID] = player;
+            const player = createNewPlayer(uuid(), notifyClient);
+            players[player.playerID] = player;
 
             broadcast({
                 method: 'updatePlayers',
@@ -117,18 +118,23 @@ function createNewMatch(disposer) {
                 scheduleMatchStart();
             }
 
-            return playerID;
+            return player.playerID;
         },
         getPlayer(playerID) {
-            return playerObjects[playerID];
+            return players[playerID];
         },
         removePlayer(playerID) {
             if (players[playerID]) {
                 delete players[playerID];
-                broadcast({
-                    method: 'updatePlayers',
-                    playersRequired: playersRequired(),
-                });
+
+                if (listPlayers().length) {
+                    broadcast({
+                        method: 'updatePlayers',
+                        playersRequired: playersRequired(),
+                    });
+                } else {
+                    disposer();
+                }
             }
         },
     };

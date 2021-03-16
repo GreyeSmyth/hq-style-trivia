@@ -1,4 +1,5 @@
 const MATCH_STATE = require('../definitions/enums/matchState');
+
 const matchNotFoundError = require('../errors/matchNotFoundError');
 const playerNotFoundError = require('../errors/playerNotFoundError');
 const notAcceptingAnswersError = require('../errors/notAcceptingAnswersError');
@@ -15,12 +16,12 @@ function submitAnswer({ matchCode, playerID, answerID }, context) {
         return playerNotFoundError;
     }
 
-    if (match.currentState.matchState !== MATCH_STATE.ACCEPTING_ANSWERS) {
+    if (match.matchState !== MATCH_STATE.ACCEPTING_ANSWERS) {
         return notAcceptingAnswersError;
     }
 
     player.selectAnswer(answerID);
-    return { code: 'answerSubmitted' };
+    return { method: 'answerSubmitted' };
 }
 
 module.exports = submitAnswer;

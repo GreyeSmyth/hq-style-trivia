@@ -17,7 +17,7 @@ const WsRequestService = types
 				const message = JSON.stringify(messageJSON);
 				self.webSocket.send(message);
 			} catch(e) {
-				console.error(e);
+				console.error('Unable to encode message to server', e);
 			}
 		},
 

@@ -5,6 +5,8 @@ const MainMenu = types
 	.model('MainMenu', {
 		isMenuActive: true,
 		isCreatingMatch: false,
+
+		matchCode: '',
 	})
 	.views(self => ({
 		get context() {
@@ -13,18 +15,12 @@ const MainMenu = types
 		get modelStore() {
 			return self.context.modelStore;
 		},
-		get shouldDisplayMainMenu() {
+		get shouldDisplayMenuOptions() {
 			return self.isMenuActive;
 		},
-		get shouldDisplayCodeEntry() {
-			return !self.isMenuActive;
-		},
-		get shouldCreateMatch() {
+		get shouldDisplayCreateMatch() {
 			return self.isCreatingMatch;
 		},
-		get shouldJoinMatch() {
-			return !self.isCreatingMatch;
-		}
 	}))
 	.actions(self => ({
 		displayMatchCreate() {
@@ -38,12 +34,16 @@ const MainMenu = types
 		returnToMainMenu() {
 			self.isMenuActive = true;
 		},
-		submitCode(matchCode) {
+		updateCode(matchCode) {
+			self.matchCode = matchCode;
+		},
+		submitCode() {
 			if (self.isCreatingMatch) {
-				self.modelStore.createMatch(matchCode);
+				self.modelStore.createMatch(self.matchCode);
 			} else {
-				self.modelStore.joinMatch(matchCode);
+				self.modelStore.joinMatch(self.matchCode);
 			}
+			self.matchCode = '';
 			self.isMenuActive = true;
 		},
 	}));

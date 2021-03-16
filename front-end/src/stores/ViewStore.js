@@ -18,6 +18,21 @@ const ViewStore = types
 		get modelStore() {
 			return self.context.modelStore;
 		},
+		get match() {
+			return self.modelStore && self.modelStore.match;
+		},
+		get round() {
+			return self.match && self.match.round;
+		},
+		get isMainMenuActive() {
+			return !self.match;
+		},
+		get isLobbyActive() {
+			return self.match && !self.round;
+		},
+		get areAnswerChoicesActive() {
+			return !!self.round;
+		},
 	}))
 	.actions(self => ({
 	}));

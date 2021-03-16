@@ -9,7 +9,7 @@ function joinMatch({ matchCode }, context) {
         return matchNotFoundError;
     }
 
-    if (match.currentState.matchState !== MATCH_STATE.ACCEPTING_PLAYERS) {
+    if (match.matchState !== MATCH_STATE.ACCEPTING_PLAYERS) {
         return notAcceptingPlayersError;
     }
     
@@ -18,7 +18,7 @@ function joinMatch({ matchCode }, context) {
         method: 'matchJoined',
         matchCode,
         playerID,
-        ...match.currentState,
+        ...match.lobbyState,
     };
 }
 

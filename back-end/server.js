@@ -11,11 +11,11 @@ const wss = new WebSocket.Server({
 	clientTracking: true,
 });
 
-
 const matches = {};
 const matchesContext = {
 	addMatch: (newMatch, matchCode) => {
 		matches[matchCode] = newMatch;
+		return newMatch;
 	},
 	getMatch: matchCode => matches[matchCode],
 	removeMatch: matchCode => {
@@ -31,16 +31,16 @@ wss.on('connection', ws => {
 			response = methods[method](params, {
 				notifyClient: messageJSON => {
 					try {
-						const message = JSON.stringify(messageJSON);
-						ws.send(message);
+						const replyMessage = JSON.stringify(messageJSON);
+						ws.send(replyMessage);
 					} catch(e) {
-						// TODO: log error
+						console.error('Error encoding response message', e);
 					}
 				},
 				...matchesContext,
 			});
 		} catch(e) {
-			// TODO: log error
+			console.error('Error processing client request', e);
 			response = malformedRequestError;
 		}
 		ws.send(JSON.stringify(response));

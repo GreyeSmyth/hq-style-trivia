@@ -33,14 +33,14 @@ const ModelStore = types
 				if (self.match.matchState === MATCH_STATE.AWAITING_PLAYERS) {
 					self.requestService.leaveMatch(self.match.id, self.match.player.id);
 				}
-				self.match = null;
+				self.match = undefined;
 			}
 		},
-		initMatch(matchCode, playerID, playersRequred, matchStartsAt) {
+		initMatch(matchCode, playerID, playersRequired, matchStartsAt) {
 			self.match = Match.create({
 				id: matchCode,
 				player: { id: playerID },
-				playersRequred,
+				playersRequired,
 			}, self.context);
 			
 			if (matchStartsAt) {

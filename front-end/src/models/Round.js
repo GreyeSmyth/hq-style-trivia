@@ -1,4 +1,5 @@
 import { types } from 'mobx-state-tree';
+import he from 'he';
 
 import Answer from './Answer';
 
@@ -16,9 +17,12 @@ const Round = types
 	})
 	.actions(self => ({
 		setQuestion(question, answersObject, endsAt) {
-			self.question = question;
+			self.question = he.decode(question);
 			self.answers = Object.entries(answersObject)
-				.map(([ id, text ]) => Answer.create({ id, text }));
+				.map(([ id, text ]) => Answer.create({
+					id,
+					text: he.decode(text)
+				}));
 			self.endsAt = endsAt
 		},
 		selectAnswer(selectedAnswer) {
@@ -27,7 +31,7 @@ const Round = types
 		setResults(correctAnswer, resultsTally) {
 			self.correctAnswer = correctAnswer;
 			Object.entries(resultsTally)
-				.forEach(([ id: tallyID, tally ]) =>
+				.forEach(([ tallyID, tally ]) =>
 					self.answers.find(({ id }) => id === tallyID).setTally(tally));
 		},
 	}));

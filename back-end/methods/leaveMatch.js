@@ -8,12 +8,12 @@ function leaveMatch({ matchCode, playerID }, context) {
         return matchNotFoundError;
     }
 
-    if (match.currentState.matchStartsAt) {
+    if (match.lobbyState.matchStartsAt) {
         return matchAlreadyStartingError;
     }
     
-    const playerID = match.removePlayer(playerID);
-    return { method: 'playerRemoved' };
+    match.removePlayer(playerID);
+    return { method: 'matchLeft' };
 }
 
 module.exports = leaveMatch;

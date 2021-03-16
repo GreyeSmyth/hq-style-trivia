@@ -24,14 +24,14 @@ const WsListenerService = types
 		afterCreate() {
 			self.webSocket.addEventListener('message', (event) => {
 				try {
-					const { method, ...params } = JSON.parse(event);
+					const { method, ...params } = JSON.parse(event.data);
 					if (self[method] instanceof Function) {
 						self[method](params);
 					} else {
 						console.error('Unrecognized method requested');
 					}
 				} catch (e) {
-					console.error('Unable to parse server message');
+					console.error('Unable to parse server message', e);
 				}
 			})
 		},
@@ -40,13 +40,16 @@ const WsListenerService = types
 			console.error(`Server responded with an error: ${code}, ${message}`);
 		},
 
-		matchJoined({ matchCode, playerID, playersRequred, matchStartsAt }) {
-			self.modelStore.initMatch(matchCode, playerID, playersRequred, matchStartsAt);
+		matchJoined({ matchCode, playerID, playersRequired, matchStartsAt }) {
+			self.modelStore.initMatch(matchCode, playerID, playersRequired, matchStartsAt);
+		},
+		matchLeft() {
+			// Nothing to do
 		},
 		
-		updatePlayers({ playersRequred }) {
+		updatePlayers({ playersRequired }) {
 			if (self.match) {
-				self.match.updatePlayers(playersRequred);
+				self.match.updatePlayers(playersRequired);
 			}
 		},
 		startMatch({ matchStartsAt }) {
@@ -54,9 +57,9 @@ const WsListenerService = types
 				self.match.startMatch(matchStartsAt);
 			}
 		},
-		startRound({ roundNumber }) {
+		startRound({ currentRound }) {
 			if (self.match) {
-				self.match.startMatch(roundNumber);
+				self.match.startRound(currentRound);
 			}
 		},
 
@@ -81,7 +84,7 @@ const WsListenerService = types
 		revealMatchWon({ answersTally }) {
 			if (self.round) {
 				self.round.setResults(self.round.selectedAnswer, answersTally);
-				self.match.markAsWon();
+				self.match.setWon();
 			}
 		},
 	}));

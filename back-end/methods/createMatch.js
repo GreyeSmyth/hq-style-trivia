@@ -7,16 +7,17 @@ function createMatch({ matchCode }, context) {
         return matchCodeInUseError;
     }
 
-    const match = context.addMatch(
-        createNewMatch(() => context.removeMatch(matchCode)),
-        matchCode,
+    const match = createNewMatch(
+        () => context.removeMatch(matchCode)
     );
+    context.addMatch(match, matchCode);
+
     const playerID = match.addPlayer(context.notifyClient);
     return {
         method: 'matchJoined',
         matchCode,
         playerID,
-        ...match.currentState,
+        ...match.lobbyState,
     };
 }
 
